@@ -1,0 +1,11 @@
+// npm install @react-navigation/stack
+npm install @react-navigation/native
+npx expo install react-native-gesture-handler
+Pressable
+onPress={() => props.navigation.navigate("form")}
+
+import {NavigationContainer} from @react-navigation/native
+
+<NavigationContainer>
+
+</NavigationContainer>
