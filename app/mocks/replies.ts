@@ -4,7 +4,7 @@ const repliesDummy: ReplyAPI[] = [
   {
     id: 1,
     content: "Begitulah hidup orang susah",
-    image: "null",
+    image: null,
     created_at: "2023-11-02T16:41:38.228Z",
     updated_at: "2023-11-02T17:09:17.774Z",
     user: {
@@ -58,7 +58,7 @@ const repliesDummy: ReplyAPI[] = [
   {
     id: 14,
     content: "Aku tetangganya Patrick",
-    image: "null",
+    image: null,
     created_at: "2023-11-03T03:26:45.608Z",
     updated_at: "2023-11-03T03:26:45.608Z",
     user: {

@@ -5,18 +5,31 @@ import {
   Text,
   VStack,
   Image,
-  Link,
   FlatList,
   Pressable,
   Spacer,
+  useTheme,
+  AspectRatio,
 } from "native-base";
+import repliesDummy from "../../mocks/replies";
+import getDuration from "../../utils/getDuration";
 
 const DetailThread = ({ route, navigation }: any) => {
   const { thread } = route.params;
+  const replies = repliesDummy.filter(
+    (reply) => reply.thread?.id === thread.id
+  );
+  const theme = useTheme();
   return (
-    <View>
+    <View _dark={{ bg: theme.colors.light[900] }}>
       <HStack space={2} alignItems={"center"} mb={2} p={2}>
-        <Avatar source={{ uri: thread.user.profile_picture }} />
+        <Pressable
+          onPress={() =>
+            navigation.navigate("Detail Profile", { userId: thread.user.id })
+          }
+        >
+          <Avatar source={{ uri: thread.user.profile_picture }} />
+        </Pressable>
         <VStack>
           <Text fontSize={"xl"} fontWeight={"bold"}>
             {thread.user.full_name}
@@ -48,18 +61,20 @@ const DetailThread = ({ route, navigation }: any) => {
       </HStack>
       <HStack
         space={3}
-        bg={"gray.200"}
         px={2}
         py={3}
         mt={3}
         borderColor={"gray.400"}
-        borderWidth={1}
+        _dark={{
+          bg: theme.colors.light[800],
+          borderColor: "gray.600",
+        }}
       >
         <Text>{thread.replies.length} Reply</Text>
         <Text>{thread.likes.length} Likes</Text>
       </HStack>
       <FlatList
-        data={thread.replies}
+        data={replies}
         renderItem={({ item }) => (
           <Pressable
             borderBottomWidth="1"
@@ -73,12 +88,20 @@ const DetailThread = ({ route, navigation }: any) => {
             onPress={() => {}}
           >
             <HStack space={[2, 3]} justifyContent="space-between">
-              <Avatar
-              // size={"sm"}
-              //   source={{
-              //     uri: item.user?.profile_picture,
-              //   }}
-              />
+              <Pressable
+                onPress={() => {
+                  navigation.navigate("Detail Profile", {
+                    userId: item.user?.id,
+                  });
+                }}
+              >
+                <Avatar
+                  size={"md"}
+                  source={{
+                    uri: item.user?.profile_picture,
+                  }}
+                />
+              </Pressable>
               <VStack w={"85%"}>
                 <Text
                   _dark={{
@@ -87,7 +110,8 @@ const DetailThread = ({ route, navigation }: any) => {
                   color="coolGray.800"
                   bold
                 >
-                  John Doe • @johndoe
+                  {item.user?.full_name} • @{item.user?.username} •{" "}
+                  {getDuration(item.updated_at)}
                 </Text>
                 <Text
                   color="coolGray.600"
@@ -98,15 +122,17 @@ const DetailThread = ({ route, navigation }: any) => {
                   {item.content}
                 </Text>
                 {item.image && (
-                  <Image
-                    source={{ uri: item.image }}
-                    alt={item.content.split(" ").slice(0, 5).join(" ")}
-                    size={"xl"}
-                  />
+                  <AspectRatio w={"100%"} ratio={16 / 9}>
+                    <Image
+                      source={{ uri: item.image }}
+                      alt={item.content.split(" ").slice(0, 5).join(" ")}
+                      // size={"xl"}
+                    />
+                  </AspectRatio>
                 )}
               </VStack>
               <Spacer />
-              <Text
+              {/* <Text
                 fontSize="xs"
                 _dark={{
                   color: "warmGray.50",
@@ -115,7 +141,7 @@ const DetailThread = ({ route, navigation }: any) => {
                 alignSelf="flex-start"
               >
                 4d
-              </Text>
+              </Text> */}
             </HStack>
           </Pressable>
         )}

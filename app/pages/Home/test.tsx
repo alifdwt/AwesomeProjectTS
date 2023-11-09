@@ -1,116 +1,236 @@
 import {
   Avatar,
-  HStack,
-  Text,
-  VStack,
   Box,
-  Heading,
+  HStack,
+  Image,
+  Text,
+  Fab,
+  Pressable,
   FlatList,
+  VStack,
   Spacer,
+  Button,
+  useTheme,
+  StatusBar,
+  useColorMode,
+  AspectRatio,
 } from "native-base";
+import threadDummy from "../../mocks/threads";
+import { MaterialIcons } from "@expo/vector-icons";
+import getDuration from "../../utils/getDuration";
+import ThreadAPI from "../../types/ThreadCardAPI";
+import UserListAPI from "../../types/UserListAPI";
 
-const Example = () => {
-  const data = [
-    {
-      id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-      fullName: "Aafreen Khan",
-      timeStamp: "12:47 PM",
-      recentText: "Good Day!",
-      avatarUrl:
-        "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-    },
-    {
-      id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-      fullName: "Sujitha Mathur",
-      timeStamp: "11:11 PM",
-      recentText: "Cheer up, there!",
-      avatarUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyEaZqT3fHeNrPGcnjLLX1v_W4mvBlgpwxnA&usqp=CAU",
-    },
-    {
-      id: "58694a0f-3da1-471f-bd96-145571e29d72",
-      fullName: "Anci Barroco",
-      timeStamp: "6:22 PM",
-      recentText: "Good Day!",
-      avatarUrl: "https://miro.medium.com/max/1400/0*0fClPmIScV5pTLoE.jpg",
-    },
-    {
-      id: "68694a0f-3da1-431f-bd56-142371e29d72",
-      fullName: "Aniket Kumar",
-      timeStamp: "8:56 PM",
-      recentText: "All the best",
-      avatarUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr01zI37DYuR8bMV5exWQBSw28C1v_71CAh8d7GP1mplcmTgQA6Q66Oo--QedAN1B4E1k&usqp=CAU",
-    },
-    {
-      id: "28694a0f-3da1-471f-bd96-142456e29d72",
-      fullName: "Kiara",
-      timeStamp: "12:47 PM",
-      recentText: "I will call today.",
-      avatarUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&usqp=CAU",
-    },
-  ];
+const ThreadContainer = ({ navigation }: { navigation: any }) => {
+  const theme = useTheme();
+  const { colorMode } = useColorMode();
+  const threads = threadDummy;
+  const uniqueUsers: { [key: number]: UserListAPI } = {};
+  threadDummy.forEach((thread) => {
+    const { user } = thread;
+    if (!uniqueUsers[user.id]) {
+      uniqueUsers[user.id] = user;
+    }
+  });
+
   return (
     <Box>
-      <Heading fontSize="xl" p="4" pb="3">
-        Inbox
-      </Heading>
-      <FlatList
-        data={data}
-        renderItem={({ item }) => (
-          <Box
-            borderBottomWidth="1"
-            _dark={{
-              borderColor: "muted.50",
-            }}
-            borderColor="muted.800"
-            pl={["0", "4"]}
-            pr={["0", "5"]}
-            py="2"
-          >
-            <HStack space={[2, 3]} justifyContent="space-between">
+      <StatusBar
+        barStyle={colorMode === "light" ? "dark-content" : "light-content"}
+        backgroundColor={
+          colorMode === "light"
+            ? theme.colors.light[50]
+            : theme.colors.light[900]
+        }
+      />
+      <Box>
+        <HStack
+          _dark={{ bg: theme.colors.light[900] }}
+          space={4}
+          p={["2", "4"]}
+        >
+          {Object.values(uniqueUsers).map((user) => (
+            <Pressable
+              key={user.id}
+              // onPress={() => {
+              //   navigation.navigate("User Profile", { user });
+              // }}
+              justifyContent={"center"}
+              alignItems={"center"}
+            >
               <Avatar
-                size="48px"
+                bg="green.500"
+                size={"60px"}
                 source={{
-                  uri: item.avatarUrl,
+                  uri: user.profile_picture,
                 }}
-              />
-              <VStack>
+                // p={1}
+              >
+                <Avatar.Badge bg={"green.500"} />
+              </Avatar>
+              <Text textAlign={"center"}>
+                {user.username.length > 8
+                  ? `${user.username.slice(0, 8)}...`
+                  : user.username}
+              </Text>
+            </Pressable>
+          ))}
+        </HStack>
+      </Box>
+      <Box h={"87%"}>
+        <ThreadCard navigation={navigation} threads={threads} />
+      </Box>
+    </Box>
+  );
+};
+
+const ThreadCard = ({
+  navigation,
+  threads,
+}: {
+  navigation: any;
+  threads: ThreadAPI[];
+}) => {
+  const theme = useTheme();
+  return (
+    <>
+      {/* <Fab
+        renderInPortal={false}
+        shadow={2}
+        size="lg"
+        icon={<MaterialIcons name="add" />}
+        colorScheme={"green"}
+      /> */}
+      {threads.length > 0 ? (
+        <FlatList
+          data={threads}
+          initialNumToRender={10}
+          refreshing={true}
+          renderItem={({ item }) => (
+            <Pressable
+              borderBottomWidth="1"
+              _dark={{
+                borderColor: "muted.50",
+                bg: theme.colors.light[900],
+              }}
+              borderColor="muted.500"
+              pl={["2", "4"]}
+              pr={["2", "5"]}
+              py="2"
+              onPress={() => {
+                navigation.navigate("Detail Thread", { thread: item });
+              }}
+            >
+              <HStack space={[2, 3]} justifyContent="space-between">
+                <Button
+                  h={"50"}
+                  w={"50"}
+                  rounded={"full"}
+                  onPress={() => {
+                    navigation.navigate("Detail Profile", {
+                      userId: item.user?.id,
+                    });
+                  }}
+                >
+                  <Avatar
+                    // size={"sm"}
+                    source={{
+                      uri: item.user?.profile_picture,
+                    }}
+                  />
+                </Button>
+                <VStack w={"85%"}>
+                  <HStack alignItems={"center"} space={1}>
+                    <Text
+                      _dark={{
+                        color: "warmGray.50",
+                      }}
+                      color="coolGray.800"
+                      bold
+                    >
+                      {item.user?.full_name}
+                    </Text>
+                    <Text color={"gray.500"}>•</Text>
+                    <Text
+                      _dark={{
+                        color: "warmGray.50",
+                      }}
+                      color="gray.500"
+                    >
+                      @{item.user?.username}
+                    </Text>
+                    <Text color={"gray.500"}>
+                      •{" "}
+                      {item.created_at !== item.updated_at && (
+                        <MaterialIcons name="edit" size={18} />
+                      )}
+                    </Text>
+                    <Text
+                      _dark={{
+                        color: "warmGray.50",
+                      }}
+                      color="gray.500"
+                    >
+                      {getDuration(item.updated_at)}
+                    </Text>
+                  </HStack>
+                  <Text
+                    color="coolGray.600"
+                    _dark={{
+                      color: "warmGray.200",
+                    }}
+                  >
+                    {item.content.length > 140
+                      ? `${item.content.slice(0, 140)}...`
+                      : item.content}
+                  </Text>
+                  {item.image && (
+                    <AspectRatio ratio={16 / 9}>
+                      <Image
+                        source={{ uri: item.image }}
+                        alt={item.content.split(" ").slice(0, 5).join(" ")}
+                        // size={"xl"}
+                      />
+                    </AspectRatio>
+                  )}
+                  <HStack ml={-2}>
+                    {/* <Spacer /> */}
+                    <Button variant={"ghost"}>
+                      <Text fontSize={14} color="coolGray.400">
+                        <MaterialIcons name="thumb-up" size={18} />{" "}
+                        {item.likes?.length}
+                      </Text>
+                    </Button>
+                    <Button variant={"ghost"}>
+                      <Text fontSize={14} color="coolGray.400">
+                        <MaterialIcons name="comment" size={18} />{" "}
+                        {item.replies?.length}
+                      </Text>
+                    </Button>
+                  </HStack>
+                </VStack>
+                <Spacer />
                 <Text
+                  fontSize="xs"
                   _dark={{
                     color: "warmGray.50",
                   }}
                   color="coolGray.800"
-                  bold
+                  alignSelf="flex-start"
                 >
-                  {item.fullName}
+                  {getDuration(item.created_at)}
                 </Text>
-                <Text
-                  color="coolGray.600"
-                  _dark={{
-                    color: "warmGray.200",
-                  }}
-                >
-                  {item.recentText}
-                </Text>
-              </VStack>
-              <Spacer />
-              <Text
-                fontSize="xs"
-                _dark={{
-                  color: "warmGray.50",
-                }}
-                color="coolGray.800"
-                alignSelf="flex-start"
-              >
-                {item.timeStamp}
-              </Text>
-            </HStack>
-          </Box>
-        )}
-        keyExtractor={(item) => item.id}
-      />
-    </Box>
+              </HStack>
+            </Pressable>
+          )}
+          keyExtractor={(item, index) => item.id.toString()}
+        />
+      ) : (
+        <Text>No Threads Found</Text>
+      )}
+    </>
   );
 };
+
+export default ThreadContainer;
+export { ThreadCard };

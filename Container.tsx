@@ -3,21 +3,37 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Avatar, Button, useTheme } from "native-base";
+import { Avatar, Button, Icon, useColorMode, useTheme } from "native-base";
 import ThreadContainer from "./app/pages/Home";
 import { Ionicons } from "@expo/vector-icons";
 import { Search, SearchHeader } from "./app/pages/Search";
 import DrawerView from "./app/components/Home/DrawerView";
 import userDummy from "./app/mocks/user";
 import DetailThread from "./app/pages/DetailThread";
+import DetailProfile from "./app/pages/DetailProfile";
+import Followers from "./app/components/Followers";
+import Following from "./app/components/Following";
 
 const Stack = createStackNavigator();
 const DrawerStack = createDrawerNavigator();
 const BottomStack = createBottomTabNavigator();
 
-const AppDrawerStack = () => {
+const AppDrawerStack = ({ navigation }: { navigation: any }) => {
+  const theme = useTheme();
+  const { colorMode } = useColorMode();
   return (
-    <DrawerStack.Navigator drawerContent={() => <DrawerView />}>
+    <DrawerStack.Navigator
+      drawerContent={() => <DrawerView navigation={navigation} />}
+      // change drawer background
+      screenOptions={{
+        drawerStyle: {
+          backgroundColor:
+            colorMode === "light"
+              ? theme.colors.light[50]
+              : theme.colors.light[900],
+        },
+      }}
+    >
       <DrawerStack.Screen
         name="AppStack"
         component={AppBottomStack}
@@ -29,6 +45,7 @@ const AppDrawerStack = () => {
 
 const AppBottomStack = ({ navigation }: { navigation: any }) => {
   const theme = useTheme();
+  const { colorMode } = useColorMode();
   const user = userDummy.find((user) => user.id === 1);
   return (
     <BottomStack.Navigator
@@ -63,8 +80,17 @@ const AppBottomStack = ({ navigation }: { navigation: any }) => {
             />
           );
         },
-        tabBarActiveTintColor: theme.colors.primary["800"],
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: theme.colors.primary["500"],
+        tabBarStyle: {
+          backgroundColor:
+            colorMode === "light"
+              ? theme.colors.light[50]
+              : theme.colors.light[900],
+        },
+        tabBarInactiveTintColor:
+          colorMode === "light"
+            ? theme.colors.light[900]
+            : theme.colors.light[50],
       })}
     >
       <BottomStack.Screen
@@ -88,21 +114,34 @@ const AppBottomStack = ({ navigation }: { navigation: any }) => {
           ),
           headerTitle: "CIRCLE",
           headerTitleStyle: {
-            color: theme.colors.light[800],
+            // color: theme.colors.light[800],
+            color:
+              colorMode === "light"
+                ? theme.colors.light[800]
+                : theme.colors.light[50],
             fontWeight: "bold",
             fontSize: 20,
           },
           headerTitleAlign: "center",
           headerRight: () => (
             <Button variant={"unstyled"}>
-              <Ionicons name="settings" size={24} />
+              <Icon
+                as={Ionicons}
+                name="settings"
+                size={6}
+                color={theme.colors.light[900]}
+                _dark={{ color: theme.colors.light[50] }}
+              />
             </Button>
           ),
           headerRightContainerStyle: {
             marginRight: 10,
           },
           headerStyle: {
-            backgroundColor: theme.colors.light[50],
+            backgroundColor:
+              colorMode === "light"
+                ? theme.colors.light[50]
+                : theme.colors.light[900],
           },
         }}
       />
@@ -124,11 +163,20 @@ const AppBottomStack = ({ navigation }: { navigation: any }) => {
           headerTitleAlign: "center",
           headerRight: () => (
             <Button variant={"unstyled"}>
-              <Ionicons name="settings" size={24} />
+              <Icon
+                as={Ionicons}
+                name="settings"
+                size={6}
+                color={theme.colors.light[900]}
+                _dark={{ color: theme.colors.light[50] }}
+              />
             </Button>
           ),
           headerStyle: {
-            backgroundColor: theme.colors.light[50],
+            backgroundColor:
+              colorMode === "light"
+                ? theme.colors.light[50]
+                : theme.colors.light[900],
           },
         }}
       />
@@ -137,15 +185,89 @@ const AppBottomStack = ({ navigation }: { navigation: any }) => {
 };
 
 export default function App() {
+  const { colorMode } = useColorMode();
+  const theme = useTheme();
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          cardStyle: {
+            backgroundColor:
+              colorMode === "light"
+                ? theme.colors.light[50]
+                : theme.colors.light[900],
+          },
+        }}
+      >
         <Stack.Screen
           name="AppDrawerStack"
           component={AppDrawerStack}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Detail Thread" component={DetailThread} />
+        <Stack.Screen
+          name="Detail Thread"
+          component={DetailThread}
+          options={{
+            headerStyle: {
+              backgroundColor:
+                colorMode === "light"
+                  ? theme.colors.light[50]
+                  : theme.colors.light[900],
+            },
+            headerTintColor:
+              colorMode === "light"
+                ? theme.colors.light[900]
+                : theme.colors.light[50],
+          }}
+        />
+        <Stack.Screen
+          name="Detail Profile"
+          component={DetailProfile}
+          options={{
+            headerStyle: {
+              backgroundColor:
+                colorMode === "light"
+                  ? theme.colors.light[50]
+                  : theme.colors.light[900],
+            },
+            headerTintColor:
+              colorMode === "light"
+                ? theme.colors.light[900]
+                : theme.colors.light[50],
+          }}
+        />
+        <Stack.Screen
+          name="Followers"
+          component={Followers}
+          options={{
+            headerStyle: {
+              backgroundColor:
+                colorMode === "light"
+                  ? theme.colors.light[50]
+                  : theme.colors.light[900],
+            },
+            headerTintColor:
+              colorMode === "light"
+                ? theme.colors.light[900]
+                : theme.colors.light[50],
+          }}
+        />
+        <Stack.Screen
+          name="Following"
+          component={Following}
+          options={{
+            headerStyle: {
+              backgroundColor:
+                colorMode === "light"
+                  ? theme.colors.light[50]
+                  : theme.colors.light[900],
+            },
+            headerTintColor:
+              colorMode === "light"
+                ? theme.colors.light[900]
+                : theme.colors.light[50],
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
